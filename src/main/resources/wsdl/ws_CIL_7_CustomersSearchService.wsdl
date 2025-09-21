@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions xmlns:sch0="http://lhsgroup.com/lhsws/money" xmlns:sch1="http://lhsgroup.com/lhsws/svlany" xmlns:sch2="http://ericsson.com/services/ws_CIL_7/sessionchange" xmlns:sch3="http://ericsson.com/services/ws_CIL_7/customerssearch" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://ericsson.com/services/ws_CIL_7" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://ericsson.com/services/ws_CIL_7">
+  <wsdl:types>
+    <xs:schema xmlns:lhsws="http://lhsgroup.com/lhsws/money" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://lhsgroup.com/lhsws/money"><xs:complexType name="money"><xs:sequence><xs:element name="amount" type="xs:double"/><xs:element name="currency" type="xs:string"/></xs:sequence></xs:complexType></xs:schema>
+    <xs:schema xmlns:lhsws="http://lhsgroup.com/lhsws/svlany" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://lhsgroup.com/lhsws/svlany"><xs:complexType name="svlany"><xs:sequence><xs:element name="content" type="xs:string"/></xs:sequence></xs:complexType></xs:schema>
+    <xs:schema xmlns:ericsson="http://ericsson.com/schemas" xmlns:wsi="http://ericsson.com/services/ws_CIL_7/sessionchange" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://ericsson.com/services/ws_CIL_7/sessionchange"><xs:complexType name="sessionChangeResponse"/><xs:complexType name="valuesListpartRequest"><xs:all><xs:element name="key" type="xs:string"><xs:annotation><xs:documentation>
+													&lt;p&gt; Name of the value that shall be changed. See release dependent documentation for supported keys&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element name="value" type="xs:string"><xs:annotation><xs:documentation>
+													&lt;p&gt;New value for a named value.&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element></xs:all></xs:complexType><xs:complexType name="valuesRequest"><xs:annotation><xs:documentation>
+								&lt;p&gt;A list of all named values that shall be changed with this command.&lt;/p&gt;
+							</xs:documentation></xs:annotation><xs:sequence><xs:element maxOccurs="unbounded" name="item" type="wsi:valuesListpartRequest"/></xs:sequence></xs:complexType><xs:complexType name="sessionChangeRequest"><xs:annotation><xs:documentation>
+					&lt;p&gt;
+					
+					&lt;/p&gt;
+				</xs:documentation></xs:annotation><xs:all><xs:element minOccurs="0" name="values" type="wsi:valuesRequest"/></xs:all></xs:complexType></xs:schema>
+    <xs:schema xmlns:ericsson="http://ericsson.com/schemas" xmlns:sessionchange="http://ericsson.com/services/ws_CIL_7/sessionchange" xmlns:wsi="http://ericsson.com/services/ws_CIL_7/customerssearch" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://ericsson.com/services/ws_CIL_7/customerssearch"><xs:import namespace="http://ericsson.com/services/ws_CIL_7/sessionchange"/><xs:element name="customersSearchRequest" type="wsi:customersSearchRequest"/><xs:element name="customersSearchResponse" type="wsi:customersSearchResponse"/><xs:complexType name="searchResultListpartResponse"><xs:all><xs:element minOccurs="0" name="externalCustomerId" type="xs:string"><xs:annotation><xs:documentation>
+													&lt;p&gt;external customer id (e.g. from PeopleSoft CRM)&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="externalCustomerSetId" type="xs:string"><xs:annotation><xs:documentation>
+													&lt;p&gt;external customer set id (e.g. from PeopleSoft CRM)&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csCode" type="xs:string"><xs:annotation><xs:documentation>
+													&lt;p&gt;customer code&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="buId" type="xs:long"><xs:annotation><xs:documentation>
+													&lt;p&gt;identifier of the business unit assigned to the customer&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="partyType" type="xs:string"><xs:annotation><xs:documentation>
+													&lt;p&gt;party type identifier. C: cusotmer, B: business partner, O: operator&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csDealerid" type="xs:long"><xs:annotation><xs:documentation>
+													&lt;p&gt;dealer id&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrLname" type="xs:string"><xs:annotation><xs:appinfo>
+													<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_LONG_CUST_NAME" source="BUC808a"/>
+													<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_PC22701" source="PC22701"/>
+												</xs:appinfo><xs:documentation>
+													&lt;p&gt;last name&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrFname" type="xs:string"><xs:annotation><xs:appinfo>
+													<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_LONG_CUST_NAME" source="BUC808a"/>
+													<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_PC22701" source="PC22701"/>
+												</xs:appinfo><xs:documentation>
+													&lt;p&gt;first name&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrName" type="xs:string"><xs:annotation><xs:appinfo>
+													<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_LONG_CUST_NAME" source="BUC808a"/>
+													<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_PC22701" source="PC22701"/>
+												</xs:appinfo><xs:documentation>
+													&lt;p&gt;name&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrStreet" type="xs:string"><xs:annotation><xs:appinfo>
+													<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_PC22701" source="PC22701"/>
+												</xs:appinfo><xs:documentation>
+													&lt;p&gt;street name&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrStreetno" type="xs:string"><xs:annotation><xs:appinfo>
+													<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_PC22701" source="PC22701"/>
+												</xs:appinfo><xs:documentation>
+													&lt;p&gt;street number&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrZip" type="xs:string"><xs:annotation><xs:documentation>
+													&lt;p&gt;zip code&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrCity" type="xs:string"><xs:annotation><xs:documentation>
+													&lt;p&gt;city name&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrBirthdt" type="xs:date"><xs:annotation><xs:documentation>
+													&lt;p&gt;birth date&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csStatus" type="xs:string"><xs:annotation><xs:documentation>
+													&lt;p&gt;customer status&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csLevelCode" type="xs:string"><xs:annotation><xs:documentation>
+													&lt;p&gt;customer level&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="paymentResp" type="xs:string"><xs:annotation><xs:documentation>
+													&lt;p&gt;payment responsibility&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csIdHigh" type="xs:long"><xs:annotation><xs:documentation>
+													&lt;p&gt;Parent customer id&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csIdHighPub" type="xs:string"><xs:annotation><xs:appinfo>
+													<ericsson:since source="HY82181"/>
+												</xs:appinfo><xs:documentation>
+													&lt;p&gt;Parent customer public key&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csContrResp" type="xs:string"><xs:annotation><xs:documentation>
+													&lt;p&gt;contract responsibility&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csId" type="xs:long"><xs:annotation><xs:documentation>
+													&lt;p&gt;customer id&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csIdPub" type="xs:string"><xs:annotation><xs:documentation>
+													&lt;p&gt;Customers public key&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="markedForRerating" type="xs:string"><xs:annotation><xs:documentation>
+													&lt;p&gt;Indicates whether the customer is marked as a candidate for re-rating&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="extLcStatus" type="xs:string"><xs:annotation><xs:appinfo>
+													<ericsson:since source="BUC72A_10-1"/>
+												</xs:appinfo><xs:documentation>
+													&lt;p&gt;Public key of the external life cycle status of the customer.&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csAliasName" type="xs:string"><xs:annotation><xs:appinfo>
+													<ericsson:since source="BUC72A_10-1"/>
+												</xs:appinfo><xs:documentation>
+													&lt;p&gt;Customer alias.&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="isDummyPreactivated" type="xs:string"><xs:annotation><xs:appinfo>
+													<ericsson:since source="PC28497"/>
+												</xs:appinfo><xs:documentation>
+													&lt;p&gt;Flag that indicates if it is a Dummy customer, used for pre-activated postpaid contracts.&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="fwdChargePrivacyInd" type="xs:string"><xs:annotation><xs:appinfo>
+													<ericsson:since source="NIP-146"/>
+												</xs:appinfo><xs:documentation>
+													&lt;p&gt;Indicates that some call data, related to charges whose originator customer and payer customer are different,
+													may be protected from being visible on the payer's invoice call details.
+													Null (default): Feature is off.
+													M: Masked, which indicates the sensitive data will be masked.
+													&lt;/p&gt;
+												</xs:documentation></xs:annotation></xs:element></xs:all></xs:complexType><xs:complexType name="searchResultResponse"><xs:annotation><xs:documentation>
+								&lt;p&gt;A list with the following attributes:
+								customer code,
+								lastname,
+								firstname,
+								name,
+								street,
+								street no,
+								zipcode,
+								city,
+								birthdate,
+								status,
+								parent id,
+								customer level,
+								payment responsible,
+								customer id,&lt;/p&gt;
+							</xs:documentation></xs:annotation><xs:sequence><xs:element maxOccurs="unbounded" minOccurs="0" name="item" type="wsi:searchResultListpartResponse"/></xs:sequence></xs:complexType><xs:complexType name="customersSearchResponse"><xs:annotation><xs:documentation>
+					&lt;p&gt;&lt;/p&gt;
+				</xs:documentation></xs:annotation><xs:all><xs:element minOccurs="0" name="searchResult" type="wsi:searchResultResponse"/><xs:element minOccurs="0" name="searchIsComplete" type="xs:boolean"><xs:annotation><xs:documentation>
+							&lt;p&gt;flag indicating if search was completed.&lt;/p&gt;&lt;p&gt;This flag will be set to false if more rows than specified in Srch_Count are available in the database&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element></xs:all></xs:complexType><xs:complexType name="extLcStatusesRequest"><xs:annotation><xs:appinfo>
+								<ericsson:since source="BUC72A_10-1"/>
+							</xs:appinfo><xs:documentation>
+								&lt;p&gt;Public key of the external life cycle status of the customer.&lt;/p&gt;
+							</xs:documentation></xs:annotation><xs:sequence><xs:element maxOccurs="unbounded" minOccurs="0" name="extLcStatus" type="xs:string"/></xs:sequence></xs:complexType><xs:complexType name="statesRequest"><xs:annotation><xs:documentation>
+								&lt;p&gt;customer status&lt;/p&gt;
+							</xs:documentation></xs:annotation><xs:sequence><xs:element maxOccurs="unbounded" minOccurs="0" name="csStatus" type="xs:string"/></xs:sequence></xs:complexType><xs:complexType name="inputAttributes"><xs:annotation><xs:documentation>
+					&lt;p&gt;customer specific attributes&lt;/p&gt;
+				</xs:documentation></xs:annotation><xs:all><xs:element minOccurs="0" name="ignoreBuInd" type="xs:boolean"><xs:annotation><xs:documentation>
+							&lt;p&gt;Flag determines if result contains only customers with the current business unit or all business units valid for the user&lt;/p&gt;&lt;p&gt;The login business unit is ingnored if value is true, default false&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="ignoreDealerInd" type="xs:boolean"><xs:annotation><xs:documentation>
+							&lt;p&gt;Flag determines if result contains only customers with the current dealer or all dealers valid for the user&lt;/p&gt;&lt;p&gt;The login dealer is ignored if value is true, default false&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="searcher" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;This argument will be used if the client wants to use/create another searcher in the registry for searching for customers.&lt;/p&gt;&lt;p&gt;The default searcher is "CUSTOMERS_SEARCHER" which  finds the customers using tables CUSTOMER_ALL and CCONTACT_ALL.&lt;/p&gt;&lt;p&gt;If you want to use another scenario, you must specified it in the &lt;code&gt;Registry_CMS_BusinessPartner_Searcher.xml&lt;/code&gt;, and call this command with the new created searcher name
+							as the value for this argument.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csIdHigh" type="xs:long"><xs:annotation><xs:documentation>
+							&lt;p&gt;id of parent level of the customer&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csIdHighPub" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;Customers public key&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrState" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;state of the postal address&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="countryId" type="xs:long"><xs:annotation><xs:documentation>
+							&lt;p&gt;country id of the postal address&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="countryIdPub" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;Public key of the country&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="externalCustomerId" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;external customer id (e.g. from PeopleSoft CRM)&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="externalCustomerSetId" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;external customer set id (e.g. from PeopleSoft CRM)&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csCode" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;customer code&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csIdPub" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;customer public key&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csDealerid" type="xs:long"><xs:annotation><xs:documentation>
+							&lt;p&gt;dealer id&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csDealeridPub" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;Dealers public key&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csStatus" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;customer status&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="states" type="wsi:statesRequest"/><xs:element minOccurs="0" name="csLevelCode" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;customer level (Use the '!' sign for logical 'NOT')  e.g. 1,2,!1,...&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrSocialseno" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;social security number&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrDrivelicence" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;driving licence number&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrIdno" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;identification document number&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrCompno" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;company registration number&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrTaxno" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;tax registration number&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="prgCode" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;price group&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="rpcode" type="xs:long"><xs:annotation><xs:documentation>
+							&lt;p&gt;rate plan&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="rpcodePub" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;Public key of the rateplan&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="costId" type="xs:long"><xs:annotation><xs:documentation>
+							&lt;p&gt;cost center&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="costCodePub" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;Public key of the cost center&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrRoles" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;address roles &lt;/p&gt;&lt;p&gt;a string consisting of the address roles that will be searched.&lt;/p&gt;&lt;p&gt;If no Address Role is given the default address role will be used.&lt;/p&gt;&lt;p&gt;The roles 'A' and 'F' are only available in scope of the PC 22694.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrLname" type="xs:string"><xs:annotation><xs:appinfo>
+							<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_LONG_CUST_NAME" source="BUC808a"/>
+							<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_PC22701" source="PC22701"/>
+						</xs:appinfo><xs:documentation>
+							&lt;p&gt;last name &lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrFname" type="xs:string"><xs:annotation><xs:appinfo>
+							<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_LONG_CUST_NAME" source="BUC808a"/>
+							<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_PC22701" source="PC22701"/>
+						</xs:appinfo><xs:documentation>
+							&lt;p&gt;first name&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrName" type="xs:string"><xs:annotation><xs:appinfo>
+							<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_LONG_CUST_NAME" source="BUC808a"/>
+							<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_PC22701" source="PC22701"/>
+						</xs:appinfo><xs:documentation>
+							&lt;p&gt;name&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrZip" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;zip code&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrCity" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;city name&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrStreet" type="xs:string"><xs:annotation><xs:appinfo>
+							<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_PC22701" source="PC22701"/>
+						</xs:appinfo><xs:documentation>
+							&lt;p&gt;street name&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrStreetno" type="xs:string"><xs:annotation><xs:appinfo>
+							<ericsson:since enhancement="length is enlarged based on license LHS_BSCS_PC22701" source="PC22701"/>
+						</xs:appinfo><xs:documentation>
+							&lt;p&gt;street number&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrEmail" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;email address&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="adrBirthdt" type="xs:date"><xs:annotation><xs:documentation>
+							&lt;p&gt;birth date&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="srchCount" type="xs:integer"><xs:annotation><xs:documentation>
+							&lt;p&gt;search count&lt;/p&gt;&lt;p&gt;the search output is restricted to the number of rows specified here.&lt;/p&gt;&lt;p&gt;If more rows exist in the database than specified here,
+							the boolean flag Search_IS_COMPLETE will be set to false. If not specified a default value is taken from the registry. See entry CMS Settings/Business Partner Search/defaultResultSetSize.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="startIndex" type="xs:long"><xs:annotation><xs:documentation>
+							&lt;p&gt;Specifies how many entries in the output should be skipped. Together with the &lt;code&gt;SRCH_COUNT&lt;/code&gt; parameter it provides a
+							paging in the result set of a search. E.g. if the parameter is set to 50 and &lt;code&gt;SRCH_COUNT&lt;/code&gt; is set to 20, this command provides the entries 51 to 70 of the query.
+							If not passed the command provides the search result 1 up to &lt;code&gt;SRCH_COUNT&lt;/code&gt;.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="flagCase" type="xs:boolean"><xs:annotation><xs:documentation>
+							&lt;p&gt;case sensitive search&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="flagMatchcode" type="xs:boolean"><xs:annotation><xs:documentation>
+							&lt;p&gt;enable matchcode search&lt;/p&gt;&lt;p&gt;If set to true a matchcode search for the lastname will be executed&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="paymentResp" type="xs:boolean"><xs:annotation><xs:documentation>
+							&lt;p&gt;enable Payment Responsible search&lt;/p&gt;&lt;p&gt;If set to true then only payment responsible customers are searched and if set to false then only not payment responsible customers searched. No restriction in case of Unset&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="csContrResp" type="xs:boolean"><xs:annotation><xs:documentation>
+							&lt;p&gt;enable Contract Responsible search&lt;/p&gt;&lt;p&gt;If set to true then only Contract responsible customers are searched and if set to false then only not Contract responsible customers searched. No restriction in case of Unset&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="laMember" type="xs:boolean"><xs:annotation><xs:documentation>
+							&lt;p&gt;enable LA member search&lt;/p&gt;&lt;p&gt;If set to true then only LA member are searched and if set to flase then only Flat subscriber searched. No restriction in case of Unset&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="partyRoleId" type="xs:long"><xs:annotation><xs:documentation>
+							&lt;p&gt;party role private key&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="partyRoleShname" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;party role public key&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="partyType" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;party type identifier. C: customer, B: business partner, O: operator. If no value is passed for this parameter, only parameter types C and B are retrieved and O is ignored.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="useCsrRoles" type="xs:boolean"><xs:annotation><xs:documentation>
+							&lt;p&gt;flag indicates to search for just for customers holding roles the csr is authorized for. If not provided the default value is true which restricts the search to the roles of the CSR. In case &lt;code&gt;PARTY_ROLE_ID&lt;/code&gt; is used as input, this parameter is not considered.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="documentIdPub" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;document reference number&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="documentId" type="xs:long"><xs:annotation><xs:documentation>
+							&lt;p&gt;internal id of financial document&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="documentRefDate" type="xs:dateTime"><xs:annotation><xs:documentation>
+							&lt;p&gt;document reference date&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="transactionIdPub" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;financial transaction reference number&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="transactionId" type="xs:long"><xs:annotation><xs:documentation>
+							&lt;p&gt;interal id of financial transaction&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="transactionRefDate" type="xs:dateTime"><xs:annotation><xs:documentation>
+							&lt;p&gt;transaction reference date&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="transactionDocNo" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;Document no if the transaction&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="anonymous" type="xs:boolean"><xs:annotation><xs:documentation>
+							&lt;p&gt;If set to true returns only anonymous customers, false will return only non anonymous customers. Default is false.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="markedForRerating" type="xs:boolean"><xs:annotation><xs:documentation>
+							&lt;p&gt;Indicates customers to search:
+							&lt;ul&gt;&lt;li&gt;unset - all customers&lt;/li&gt;&lt;li&gt;TRUE - customers that are marked as candidates for re-rating&lt;/li&gt;&lt;li&gt;FALSE - customers that are not marked as candidates for re-rating &lt;/li&gt;&lt;/ul&gt;
+							&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="bscsContract" type="xs:boolean"><xs:annotation><xs:documentation>
+							&lt;p&gt;Indicates customers to search:
+							&lt;ul&gt;&lt;li&gt;unset - all customers&lt;/li&gt;&lt;li&gt;TRUE - Exclude customers that ONLY have CS Contracts&lt;/li&gt;&lt;li&gt;FALSE - all customers&lt;/li&gt;&lt;/ul&gt;
+							&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="rootCsId" type="xs:long"><xs:annotation><xs:documentation>
+							&lt;p&gt;Id of a LA structure root&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="rootCsIdPub" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;LA structure root public key&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="billingAccountId" type="xs:long"><xs:annotation><xs:documentation>
+							&lt;p&gt;Billing account internal identifier.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="billingAccountCode" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;Billing account public identifier.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="billingAccountName" type="xs:string"><xs:annotation><xs:documentation>
+							&lt;p&gt;The billing account description. This parameter is available
+							only when LHS_BSCS_RULEBASEDPAYMNT is switched on.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="cspAccno" type="xs:string"><xs:annotation><xs:appinfo>
+							<ericsson:since source="PC25716"/>
+						</xs:appinfo><xs:documentation>
+							&lt;p&gt;Customer's bank account number. This parameter is available
+							only when LHS_BSCS_DD_SUPPORT as well as LHS_BSCS_PC25716_A
+							are switched on.
+							&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="iban" type="xs:string"><xs:annotation><xs:appinfo>
+							<ericsson:since source="PC25716"/>
+						</xs:appinfo><xs:documentation>
+							&lt;p&gt;Customer's international bank account number. This parameter
+							is available only when LHS_BSCS_DD_SUPPORT as well as
+							LHS_BSCS_PC25716_A are switched on.
+							&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="collectionInd" type="xs:boolean"><xs:annotation><xs:appinfo>
+							<ericsson:since source="BUC851-1_6-5"/>
+						</xs:appinfo><xs:documentation>
+							&lt;p&gt;Flag that indicates to search customers that are in collection process.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="hasOpenCreditDoc" type="xs:boolean"><xs:annotation><xs:appinfo>
+							<ericsson:since source="BUC851-1_6-5"/>
+						</xs:appinfo><xs:documentation>
+							&lt;p&gt;Flag that indicates to search customers that have open credit documents.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="hasOpenDebtDoc" type="xs:boolean"><xs:annotation><xs:appinfo>
+							<ericsson:since source="BUC851-1_6-5"/>
+						</xs:appinfo><xs:documentation>
+							&lt;p&gt;Flag that indicates to search customers that have open debt documents.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="billcycle" type="xs:string"><xs:annotation><xs:appinfo>
+							<ericsson:since source="BUC851-1_6-5"/>
+						</xs:appinfo><xs:documentation>
+							&lt;p&gt;Restricts the search for customers within the specified billing cycle.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="extLcStatuses" type="wsi:extLcStatusesRequest"/><xs:element minOccurs="0" name="csAliasName" type="xs:string"><xs:annotation><xs:appinfo>
+							<ericsson:since source="BUC72A_10-1"/>
+						</xs:appinfo><xs:documentation>
+							&lt;p&gt;Customer alias.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="isDummyPreactivated" type="xs:boolean"><xs:annotation><xs:appinfo>
+							<ericsson:since source="PC28497"/>
+						</xs:appinfo><xs:documentation>
+							&lt;p&gt;Flag that indicates if it is a Dummy customer, used for pre-activated postpaid contracts.&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element><xs:element minOccurs="0" name="fwdChargePrivacyInd" type="xs:string"><xs:annotation><xs:appinfo>
+							<ericsson:since source="NIP-146"/>
+						</xs:appinfo><xs:documentation>
+							&lt;p&gt;Indicates that some call data, related to charges whose originator customer and payer customer are different,
+							may be protected from being visible on the payer's invoice call details.
+							Null (default): Feature is off.
+							M: Masked, which indicates the sensitive data will be masked.
+							&lt;/p&gt;
+						</xs:documentation></xs:annotation></xs:element></xs:all></xs:complexType><xs:complexType name="customersSearchRequest"><xs:all><xs:element minOccurs="0" name="inputAttributes" type="wsi:inputAttributes"/><xs:element minOccurs="0" name="sessionChangeRequest" type="sessionchange:sessionChangeRequest"/></xs:all></xs:complexType></xs:schema>
+  </wsdl:types>
+  <wsdl:message name="customersSearchRequest">
+    <wsdl:part element="sch3:customersSearchRequest" name="customersSearchRequest">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="customersSearchResponse">
+    <wsdl:part element="sch3:customersSearchResponse" name="customersSearchResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="CustomersSearchService">
+    <wsdl:operation name="customersSearch">
+<wsdl:documentation>&lt;![CDATA[&lt;p&gt;Search customers through a number of criteria from customer and contract data.&lt;/p&gt;]]&gt;</wsdl:documentation>
+      <wsdl:input message="tns:customersSearchRequest" name="customersSearchRequest">
+    </wsdl:input>
+      <wsdl:output message="tns:customersSearchResponse" name="customersSearchResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="CustomersSearchServiceSoap11" type="tns:CustomersSearchService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="customersSearch">
+      <soap:operation soapAction=""/>
+      <wsdl:input name="customersSearchRequest">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="customersSearchResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CustomersSearchService">
+    <wsdl:port binding="tns:CustomersSearchServiceSoap11" name="CustomersSearchServiceSoap11">
+      <soap:address location="http://hsm-billing-atos-1-dev:9052/wsi/services"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
