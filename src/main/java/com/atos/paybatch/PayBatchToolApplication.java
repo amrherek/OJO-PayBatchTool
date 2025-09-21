@@ -12,4 +12,5 @@ public class PayBatchToolApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(PayBatchToolApplication.class, args);
 	}
+	
 }
