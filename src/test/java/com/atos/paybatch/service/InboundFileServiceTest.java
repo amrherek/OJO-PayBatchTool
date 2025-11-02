@@ -11,23 +11,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.atos.paybatch.entity.InboundFile;
-import com.atos.paybatch.entity.PaymentChannel;
-import com.atos.paybatch.repository.FileHeaderRepository;
-import com.atos.paybatch.repository.FileTrailerRepository;
-import com.atos.paybatch.repository.InboundFileRepository;
+import com.atos.paybatch.entity.PayBatchFile;
+import com.atos.paybatch.entity.PayBatchChannel;
+import com.atos.paybatch.repository.PayBatchFileHeaderRepository;
+import com.atos.paybatch.repository.PayBatchFileTrailerRepository;
+import com.atos.paybatch.repository.PayBatchFileRepository;
 
 class InboundFileServiceTest {
 
     @Mock
-    private InboundFileRepository inboundFileRepository;
+    private PayBatchFileRepository inboundFileRepository;
     @Mock
-    private FileHeaderRepository fileHeaderRepository;
+    private PayBatchFileHeaderRepository fileHeaderRepository;
     @Mock
-    private FileTrailerRepository fileTrailerRepository;
+    private PayBatchFileTrailerRepository fileTrailerRepository;
 
     @InjectMocks
-    private InboundFileService inboundFileService;
+    private FileHandlerService inboundFileService;
 
     @BeforeEach
     void setUp() {
@@ -36,8 +36,8 @@ class InboundFileServiceTest {
 
     @Test
     void testInitInboundFile() {
-        PaymentChannel channel = new PaymentChannel();
-        InboundFile file = inboundFileService.initInboundFile("test.in");
+        PayBatchChannel channel = new PayBatchChannel();
+        PayBatchFile file = inboundFileService.initFile("test.in");
         verify(inboundFileRepository, times(1)).save(file);
     }
 

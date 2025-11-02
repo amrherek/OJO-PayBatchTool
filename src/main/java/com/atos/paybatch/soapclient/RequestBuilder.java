@@ -1,6 +1,6 @@
 package com.atos.paybatch.soapclient;
 
-import com.atos.paybatch.entity.PaymentRecord;
+import com.atos.paybatch.entity.PayBatchRecord;
 import com.atos.paybatch.stubs.financialallocation.*;
 import com.atos.paybatch.util.DateUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class RequestBuilder {
      * Builds the FinancialAllocationWriteRequest based on PaymentRecord details.
      */
     public FinancialAllocationWriteRequest buildFinancialAllocationWriteRequest(
-            PaymentRecord record,
+            PayBatchRecord record,
             Long customerId,
             String glaccount,
             SessionChangeRequest sessionChangeRequest
@@ -44,7 +44,7 @@ public class RequestBuilder {
         inputDto.setUseCase(useCase);
 
         // Remark from filename
-        inputDto.setRemark(record.getInboundFile().getFilename());
+        inputDto.setRemark(record.getPayBatchFile().getFilename());
 
         // Build Transaction DTO
         TransactionWriteInDTO transactionDto = buildTransaction(record, customerId, glaccount);
@@ -65,7 +65,7 @@ public class RequestBuilder {
     /**
      * Builds TransactionWriteInDTO for each PaymentRecord.
      */
-    private TransactionWriteInDTO buildTransaction(PaymentRecord record, Long customerId, String glaccount) {
+    private TransactionWriteInDTO buildTransaction(PayBatchRecord record, Long customerId, String glaccount) {
         TransactionWriteInDTO transactionDto = new TransactionWriteInDTO();
 
         // Customer
@@ -87,6 +87,7 @@ public class RequestBuilder {
 
         // Reference key
         transactionDto.setReferenceKey(record.getUniqueSeq());
+        
 
         // GL cash account
         transactionDto.setRefGLAccountCash(glaccount);
@@ -107,7 +108,7 @@ public class RequestBuilder {
     /**
      * Builds DocumentListRequest if invoice number is valid.
      */
-    private DocumentListRequest buildDocumentList(PaymentRecord record) {
+    private DocumentListRequest buildDocumentList(PayBatchRecord record) {
         DocumentListRequest documentList = new DocumentListRequest();
         DocumentDTO documentDTO = new DocumentDTO();
 

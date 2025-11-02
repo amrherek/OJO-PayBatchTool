@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,7 +13,7 @@
         <relativePath/>
     </parent>
 
-    <!-- ======================= Project Coordinates ======================= -->
+    <!-- ======================= Project Metadata ======================= -->
     <groupId>com.atos.paybatch</groupId>
     <artifactId>PayBatchTool</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -27,106 +26,105 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <skip.codegen>true</skip.codegen>
     </properties>
 
     <!-- ======================= Dependencies ======================= -->
     <dependencies>
 
-        <!-- ===== Spring Boot Starters ===== -->
+        <!-- ===== SPRING BOOT CORE DEPENDENCIES ===== -->
+
+        <!-- JPA / Hibernate support (compile/runtime) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+
+        <!-- Aspect-Oriented Programming support (compile/runtime) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
-        <!-- ===== Lombok for Boilerplate Reduction ===== -->
+        <!-- Retry logic for Spring components (compile/runtime) -->
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+        </dependency>
+
+        <!-- Lombok for automatic getters/setters (compile only) -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
 
-        <!-- ===== Spring Retry & AOP ===== -->
+        <!-- Oracle JDBC driver (runtime only) -->
         <dependency>
-            <groupId>org.springframework.retry</groupId>
-            <artifactId>spring-retry</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
-        <!-- ===== Testing Dependencies ===== -->
+        <!-- Jackson for JSON binding (compile/runtime) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+
+        <!-- ===== TESTING ===== -->
+
+        <!-- Spring Boot test utilities (test only) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.vintage</groupId>
-                    <artifactId>junit-vintage-engine</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <scope>test</scope>
         </dependency>
 
-        <!-- H2 Database for integration testing -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>test</scope>
-        </dependency>
 
-        <!-- ===== JAXB / JAX-WS Dependencies ===== -->
+        <!-- ===== SOAP / WSDL / JAXB STACK ===== -->
 
-        <!-- JAXB API -->
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.1</version>
-        </dependency>
-
-        <!-- JAXB Runtime -->
-        <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-        </dependency>
-
-        <!-- JAXB Core (for annotations) -->
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-        </dependency>
-
-        <!-- JAX-WS API -->
+        <!-- JAX-WS API (compile/runtime) - Defines javax.xml.ws interfaces -->
         <dependency>
             <groupId>javax.xml.ws</groupId>
             <artifactId>jaxws-api</artifactId>
             <version>2.3.1</version>
         </dependency>
 
-        <!-- JAX-WS Reference Implementation (runtime) -->
+        <!-- JAXB API (compile/runtime) - XML binding interfaces -->
         <dependency>
-            <groupId>com.sun.xml.ws</groupId>
-            <artifactId>rt</artifactId>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+
+        <!-- JAXB Runtime (runtime) - Implementation of JAXB API -->
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
             <version>2.3.3</version>
+        </dependency>
+
+        <!-- SAAJ Implementation (runtime) - Needed for SOAP message creation -->
+        <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
+            <version>1.5.3</version>
+        </dependency>
+
+        <!-- Apache CXF JAX-WS frontend (compile/runtime) - SOAP client/server core -->
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>3.6.3</version>
+        </dependency>
+
+        <!-- Apache CXF HTTP transport (compile/runtime) - Required for SOAP over HTTP -->
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
+            <version>3.6.3</version>
         </dependency>
 
     </dependencies>
@@ -146,73 +144,24 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.30</version>
                         </path>
                     </annotationProcessorPaths>
+                    <excludes>
+                        <!-- Safety measure: exclude generated sources if needed -->
+                        <exclude>**/target/generated-sources/**</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 
-            <!-- Spring Boot Maven Plugin -->
+            <!-- Spring Boot Plugin for packaging the executable JAR -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-            <!-- CXF Codegen Plugin: Generate stubs from multiple WSDLs -->
-            <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-codegen-plugin</artifactId>
-                <version>3.6.0</version>
-                <executions>
-
-                    <!-- Customer Search Service -->
-                    <execution>
-                        <id>generate-customersearch-stubs</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                        <configuration>
-                            <sourceRoot>${project.build.directory}/generated-sources/cxf/customersearch</sourceRoot>
-                            <wsdlOptions>
-                                <wsdlOption>
-                                    <wsdl>${project.basedir}/src/main/resources/wsdl/ws_CIL_7_CustomersSearchService.wsdl</wsdl>
-                                    <extraargs>
-                                        <extraarg>-p</extraarg>
-                                        <extraarg>com.atos.paybatch.stubs.customersearch</extraarg>
-                                    </extraargs>
-                                </wsdlOption>
-                            </wsdlOptions>
-                        </configuration>
-                    </execution>
-
-                    <!-- Financial Allocation Write Service -->
-                    <execution>
-                        <id>generate-financialallocation-stubs</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                        <configuration>
-                            <sourceRoot>${project.build.directory}/generated-sources/cxf/financialallocation</sourceRoot>
-                            <wsdlOptions>
-                                <wsdlOption>
-                                    <wsdl>${project.basedir}/src/main/resources/wsdl/ws_CIL_7_FinancialAllocationWriteService.wsdl.xml</wsdl>
-                                    <extraargs>
-                                        <extraarg>-p</extraarg>
-                                        <extraarg>com.atos.paybatch.stubs.financialallocation</extraarg>
-                                    </extraargs>
-                                </wsdlOption>
-                            </wsdlOptions>
-                        </configuration>
-                    </execution>
-
-                </executions>
-            </plugin>
-
         </plugins>
 
-        <!-- ======================= Eclipse M2E Lifecycle Mapping ======================= -->
+        <!-- Eclipse lifecycle mapping for ignoring CXF codegen -->
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -241,7 +190,119 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-
     </build>
+
+    <!-- ======================= Profile: generate-stubs ======================= -->
+    <!-- Run with: mvn clean compile -Pgenerate-stubs -->
+    <profiles>
+        <profile>
+            <id>generate-stubs</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+
+            <build>
+                <plugins>
+
+                    <!-- CXF Codegen Plugin: Generate stubs from WSDL files -->
+                    <plugin>
+                        <groupId>org.apache.cxf</groupId>
+                        <artifactId>cxf-codegen-plugin</artifactId>
+                        <version>3.6.3</version>
+                        <executions>
+
+                            <!-- Financial Allocation Service -->
+                            <execution>
+                                <id>generate-financialallocation-stubs</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>wsdl2java</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceRoot>${project.build.directory}/generated-sources/cxf/financialallocation</sourceRoot>
+                                    <wsdlOptions>
+                                        <wsdlOption>
+                                            <wsdl>${project.basedir}/src/main/resources/wsdl/ws_CIL_7_FinancialAllocationWriteService.wsdl</wsdl>
+                                            <extraargs>
+                                                <extraarg>-xjc-XautoNameResolution</extraarg>
+                                                <extraarg>-p</extraarg>
+                                                <extraarg>com.atos.paybatch.stubs.financialallocation</extraarg>
+                                                <extraarg>-frontend</extraarg>
+                                                <extraarg>jaxws21</extraarg>
+                                                <extraarg>-validate</extraarg>
+                                                <extraarg>-verbose</extraarg>
+                                            </extraargs>
+                                        </wsdlOption>
+                                    </wsdlOptions>
+                                </configuration>
+                            </execution>
+
+                            <!-- Customer Search Service -->
+                            <execution>
+                                <id>generate-customersearch-stubs</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>wsdl2java</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceRoot>${project.build.directory}/generated-sources/cxf/customersearch</sourceRoot>
+                                    <wsdlOptions>
+                                        <wsdlOption>
+                                            <wsdl>${project.basedir}/src/main/resources/wsdl/ws_CIL_7_CustomersSearchService.wsdl</wsdl>
+                                            <extraargs>
+                                                <extraarg>-xjc-XautoNameResolution</extraarg>
+                                                <extraarg>-p</extraarg>
+                                                <extraarg>com.atos.paybatch.stubs.customersearch</extraarg>
+                                                <extraarg>-frontend</extraarg>
+                                                <extraarg>jaxws21</extraarg>
+                                                <extraarg>-validate</extraarg>
+                                                <extraarg>-verbose</extraarg>
+                                            </extraargs>
+                                        </wsdlOption>
+                                    </wsdlOptions>
+                                </configuration>
+                            </execution>
+
+                        </executions>
+                    </plugin>
+
+                    <!-- Copy generated stubs into src/main/java -->
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>copy-stubs-to-src</id>
+                                <phase>generate-sources</phase>
+                                <configuration>
+                                    <target>
+
+                                        <!-- Clean up old stubs -->
+                                        <delete dir="${project.basedir}/src/main/java/com/atos/paybatch/stubs/financialallocation"
+                                                failonerror="false"/>
+                                        <delete dir="${project.basedir}/src/main/java/com/atos/paybatch/stubs/customersearch"
+                                                failonerror="false"/>
+
+                                        <!-- Copy new stubs -->
+                                        <copy todir="${project.basedir}/src/main/java/com/atos/paybatch/stubs/financialallocation">
+                                            <fileset dir="${project.build.directory}/generated-sources/cxf/financialallocation/com/atos/paybatch/stubs/financialallocation"/>
+                                        </copy>
+
+                                        <copy todir="${project.basedir}/src/main/java/com/atos/paybatch/stubs/customersearch">
+                                            <fileset dir="${project.build.directory}/generated-sources/cxf/customersearch/com/atos/paybatch/stubs/customersearch"/>
+                                        </copy>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

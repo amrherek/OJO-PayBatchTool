@@ -1,0 +1,5 @@
+Step 1-- Regenerate when needed
+mvn clean generate-sources -Pgenerate-stubs
+
+Step 2--Normal build (no regeneration)
+mvn clean package

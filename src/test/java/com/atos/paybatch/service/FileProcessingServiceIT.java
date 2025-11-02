@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.File;
 import java.nio.file.Files;
 
-import com.atos.paybatch.service.FileProcessingService;
+import com.atos.paybatch.service.FileProcessorService;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 class FileProcessingServiceIT {
 
     @Autowired
-    private FileProcessingService fileProcessingService;
+    private FileProcessorService fileProcessingService;
 
     @Test
     void testProcessFilesIntegration() throws Exception {

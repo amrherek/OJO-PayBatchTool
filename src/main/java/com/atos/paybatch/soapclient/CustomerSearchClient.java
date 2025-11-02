@@ -1,23 +1,26 @@
 package com.atos.paybatch.soapclient;
 
-import com.atos.paybatch.entity.PaymentRecord;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetrySynchronizationManager;
+import org.springframework.stereotype.Component;
+
+import com.atos.paybatch.entity.PayBatchRecord;
+import com.atos.paybatch.exception.TransientException;
+import com.atos.paybatch.repository.PayBatchRecordRepository;
 import com.atos.paybatch.stubs.customersearch.CustomersSearchRequest;
 import com.atos.paybatch.stubs.customersearch.CustomersSearchResponse;
 import com.atos.paybatch.stubs.customersearch.CustomersSearchService;
 import com.atos.paybatch.stubs.customersearch.InputAttributes;
+import com.atos.paybatch.util.SoapExceptionUtils;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
-import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
-/**
- * Client responsible for invoking the CustomerSearch SOAP service.
- * Handles request preparation, service call, response processing, and retry logic.
- */
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -27,73 +30,85 @@ public class CustomerSearchClient {
 
     private final CustomersSearchService customersSearchService;
     private final SessionBuilder sessionBuilder;
+    private final PayBatchRecordRepository paymentRecordRepository;
 
-    /**
-     * Searches customer by customerCode with retry logic in case of transient failures.
-     */
     @Retryable(
-            value = {RuntimeException.class},
-            maxAttemptsExpression = "${payment.api.max-retries:3}",
-            backoff = @Backoff(delayExpression = "${payment.api.retry-delay-ms:2000}")
+        value = { TransientException.class },
+        maxAttemptsExpression = "${customersearch.api.max-retries:3}",
+        backoff = @Backoff(delayExpression = "${customersearch.api.retry-delay-ms:2000}")
     )
-    public Long searchCustomer(PaymentRecord record) {
-        log.info("Invoking CustomerSearch for customerCode={} (attempt #{})",
-                record.getCustomerCode(), record.getRetryCount() + 1);
+    public Long searchCustomer(PayBatchRecord record) {
+        int attempt = RetrySynchronizationManager.getContext() != null
+                ? RetrySynchronizationManager.getContext().getRetryCount() + 1
+                : 1;
+
+        log.info("│    → [CustomerSearch] Invoking API (attempt={})", attempt);
 
         try {
             CustomersSearchRequest request = buildRequest(record);
-            log.debug("CustomerSearch request: {}", request);
-
             CustomersSearchResponse response = customersSearchService.customersSearch(request);
-            log.debug("CustomerSearch response: {}", response);
 
-            return extractCustomerId(response)
-                    .orElseThrow(() -> new RuntimeException("Customer ID not found in response"));
+            Long customerId = extractCustomerId(response).orElse(null);
+            log.info("│    → [CustomerSearch] API response: customerId={}", customerId);
+
+            if (customerId == null) {
+                log.warn("│    → [CustomerSearch] No Customer ID returned for recordId={}", record.getId());
+                markRecordFailed(record, "CustomerSearch returned no Customer ID");
+            }
+
+            return customerId;
 
         } catch (Exception ex) {
-            record.incrementRetryCnt();
-            log.error("CustomerSearch call failed for recordId={} error={}", record.getId(), ex.getMessage(), ex);
-            throw new RuntimeException("CustomerSearch API call failed", ex);
+            log.error("│    → [CustomerSearch] API error (attempt={}): {}", attempt, ex.getMessage(), ex);
+
+            boolean isTransient = SoapExceptionUtils.isTransient(ex);
+            String rootMessage = SoapExceptionUtils.getRootCauseMessage(ex);
+
+            if (isTransient) {
+                throw new TransientException("Transient error: " + rootMessage, ex);
+            } else {
+                log.error("│    → [CustomerSearch] Record failed → recordId={} | reason={}", record.getId(), rootMessage);
+                markRecordFailed(record, "CustomerSearch failed: " + rootMessage);
+                return null;
+            }
         }
     }
 
-    /**
-     * Fallback method triggered after all retries fail.
-     *
-     * @param ex     Exception that caused the failure
-     * @param record PaymentRecord being processed
-     * @return null always, as failure is handled via record status
-     */
     @Recover
-    public String recover(RuntimeException ex, PaymentRecord record) {
-        log.error("CustomerSearch permanently failed for recordId={} after {} retries: {}",
-                record.getId(), record.getRetryCount(), ex.getMessage(), ex);
-        record.setStatus(FAILURE_STATUS);
-        record.setRemark(ex.getMessage());
+    public Long recover(RuntimeException ex, PayBatchRecord record) {
+        String rootMessage = SoapExceptionUtils.getRootCauseMessage(ex);
+        log.error("│    → [CustomerSearch] Record permanently failed after retries → recordId={} | reason={}", record.getId(), rootMessage);
+        markRecordFailed(record, "CustomerSearch failed after all retry attempts: " + rootMessage);
         return null;
     }
 
-    /**
-     * Builds the SOAP request for CustomerSearch.
-     */
-    private CustomersSearchRequest buildRequest(PaymentRecord record) {
+    private CustomersSearchRequest buildRequest(PayBatchRecord record) {
         InputAttributes attributes = new InputAttributes();
         attributes.setCsCode(record.getCustomerCode());
 
         CustomersSearchRequest request = new CustomersSearchRequest();
         request.setInputAttributes(attributes);
         request.setSessionChangeRequest(sessionBuilder.buildCustomerSearchSession());
+
+        log.debug("│    → [CustomerSearch] Request built for recordId={}", record.getId());
         return request;
     }
 
-    /**
-     * Extracts customer ID from the response, wrapped in Optional.
-     */
     private Optional<Long> extractCustomerId(CustomersSearchResponse response) {
         return Optional.ofNullable(response)
                 .map(CustomersSearchResponse::getSearchResult)
                 .map(result -> result.getItem())
-                .filter(items -> !items.isEmpty())
-                .map(items -> items.get(0).getCsId());
+                .filter(list -> !list.isEmpty())
+                .map(list -> list.get(0).getCsId());
+    }
+
+    private void markRecordFailed(PayBatchRecord record, String remark) {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        record.setStatus(FAILURE_STATUS);
+        record.setUpdatedAt(currentDateTime);
+        record.setRemark(remark);
+        paymentRecordRepository.save(record);
+
+        log.warn("│    → [CustomerSearch] Record {} marked as FAILED — reason: {}", record.getId(), remark);
     }
 }

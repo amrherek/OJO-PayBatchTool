@@ -1,21 +1,29 @@
 package com.atos.paybatch.soapclient;
 
-import com.atos.paybatch.entity.PaymentRecord;
-import com.atos.paybatch.stubs.financialallocation.FinancialAllocationWriteRequest;
-import com.atos.paybatch.stubs.financialallocation.FinancialAllocationWriteResponse;
-import com.atos.paybatch.stubs.financialallocation.FinancialAllocationWriteService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
+import com.atos.paybatch.entity.PayBatchRecord;
+import com.atos.paybatch.exception.ApigeeFaultException;
+import com.atos.paybatch.exception.TransientException;
+import com.atos.paybatch.repository.PayBatchRecordRepository;
+import com.atos.paybatch.stubs.financialallocation.FinancialAllocationWriteRequest;
+import com.atos.paybatch.stubs.financialallocation.FinancialAllocationWriteResponse;
+import com.atos.paybatch.stubs.financialallocation.FinancialAllocationWriteService;
+import com.atos.paybatch.util.SoapExceptionUtils;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Client responsible for invoking the FinancialAllocationWrite SOAP service.
- * Handles request preparation, service call, response parsing, and retry logic.
+ * Handles request preparation, service invocation, retry logic, and updates PaymentRecord status.
  */
 @Component
 @Slf4j
@@ -23,68 +31,76 @@ import java.util.Optional;
 public class FinancialAllocationClient {
 
     private static final String FAILURE_STATUS = "F";
+    private static final String SUCCESS_STATUS = "P";
 
     private final FinancialAllocationWriteService financialAllocationWriteService;
     private final RequestBuilder requestBuilder;
     private final SessionBuilder sessionBuilder;
+    private final PayBatchRecordRepository paymentRecordRepository;
 
-    /**
-     * Writes financial allocation for a given payment record and customer.
-     * Retries only if the SOAP call itself fails.
-     */
     @Retryable(
-            value = {RuntimeException.class},
-            maxAttemptsExpression = "${payment.api.max-retries:3}",
-            backoff = @Backoff(delayExpression = "${payment.api.retry-delay-ms:2000}")
+        value = { TransientException.class, ApigeeFaultException.class },
+        maxAttemptsExpression = "${financialallocation.api.max-retries:3}",
+        backoff = @Backoff(delayExpression = "${financialallocation.api.retry-delay-ms:2000}")
     )
-    public Long writeFinancialAllocation(PaymentRecord record, Long customerId, String glAccount) {
-        log.info("Invoking FinancialAllocationWrite for recordId={} (attempt #{})",
-                record.getId(), record.getRetryCount() + 1);
+    public Long writeFinancialAllocation(PayBatchRecord record, Long customerId, String glAccount) {
+
+        int attempt = RetrySynchronizationManager.getContext() != null
+                ? RetrySynchronizationManager.getContext().getRetryCount() + 1
+                : 1;
+
+        log.info("│    → [FinancialAllocation] Invoking API (attempt={})", attempt);
 
         try {
             FinancialAllocationWriteRequest request = buildRequest(record, customerId, glAccount);
-            log.debug("FinancialAllocationWrite request: {}", request);
-
             FinancialAllocationWriteResponse response = financialAllocationWriteService.financialAllocationWrite(request);
-            log.debug("FinancialAllocationWrite response: {}", response);
 
-            // Only warn if transaction ID is null, but don't retry
             Long transactionId = extractTransactionId(response).orElse(null);
+            log.info("│    → [FinancialAllocation] API response: transactionId={}", transactionId);
+
             if (transactionId == null) {
-                log.warn("FinancialAllocationWrite returned no transaction ID for recordId={}", record.getId());
+                String reason = "FinancialAllocationWrite returned no transactionId";
+                log.error("│    → [FinancialAllocation] Record failed → recordId={}, customerId={}, reason={}",
+                        record.getId(), customerId, reason);
+                markRecordFailed(record, reason);
+            } else {
+                record.setTransactionId(transactionId);
+                markRecordSuccess(record);
             }
+
             return transactionId;
 
         } catch (Exception ex) {
-            record.incrementRetryCnt();
-            log.error("FinancialAllocationWrite call failed for recordId={} error={}", record.getId(), ex.getMessage(), ex);
-            throw new RuntimeException("FinancialAllocationWrite API call failed", ex);
+            log.error("│    → [FinancialAllocation] API error (attempt={}): {}", attempt, ex.getMessage(), ex);
+
+            boolean isTransient = SoapExceptionUtils.isTransient(ex);
+            String rootMessage = SoapExceptionUtils.getRootCauseMessage(ex);
+
+            if (isTransient) {
+                throw new TransientException("Transient error: " + rootMessage, ex);
+            } else {
+                log.error("│    → [FinancialAllocation] Record failed → recordId={}, reason={}",
+                        record.getId(), rootMessage);
+                markRecordFailed(record, "FinancialAllocationWrite failed: " + rootMessage);
+                return null;
+            }
         }
     }
 
-    /**
-     * Recovery method invoked after all retries fail.
-     */
     @Recover
-    public String recover(RuntimeException ex, PaymentRecord record, Long customerId, String glAccount) {
-        log.error("FinancialAllocationWrite permanently failed for recordId={} after {} retries: {}",
-                record.getId(), record.getRetryCount(), ex.getMessage(), ex);
-        record.setStatus(FAILURE_STATUS);
-        record.setRemark(ex.getMessage());
+    public Long recover(RuntimeException ex, PayBatchRecord record) {
+        String rootMessage = SoapExceptionUtils.getRootCauseMessage(ex);
+        log.error("│    → [FinancialAllocation] Record permanently failed after retries → recordId={}, reason={}",
+                record.getId(), rootMessage);
+        markRecordFailed(record, "FinancialAllocationWrite failed after retries: " + rootMessage);
         return null;
     }
 
-    /**
-     * Builds the SOAP request for FinancialAllocationWrite.
-     */
-    private FinancialAllocationWriteRequest buildRequest(PaymentRecord record, Long customerId, String glAccount) {
+    private FinancialAllocationWriteRequest buildRequest(PayBatchRecord record, Long customerId, String glAccount) {
         return requestBuilder.buildFinancialAllocationWriteRequest(
                 record, customerId, glAccount, sessionBuilder.buildFinancialSession());
     }
 
-    /**
-     * Extracts the transaction ID from the response safely.
-     */
     private Optional<Long> extractTransactionId(FinancialAllocationWriteResponse response) {
         return Optional.ofNullable(response)
                 .map(FinancialAllocationWriteResponse::getFinancialAllocationWriteOutputDTO)
@@ -92,5 +108,25 @@ public class FinancialAllocationClient {
                 .map(tx -> tx.getTransactionWriteOutDTO())
                 .filter(list -> !list.isEmpty())
                 .map(list -> list.get(0).getTransactionId());
+    }
+
+    private void markRecordFailed(PayBatchRecord record, String remark) {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        record.setStatus(FAILURE_STATUS);
+        record.setUpdatedAt(currentDateTime);
+        record.setRemark(remark);
+        paymentRecordRepository.save(record);
+
+        log.warn("│    → [FinancialAllocation] Record {} marked as FAILED — reason: {}", record.getId(), remark);
+    }
+
+    private void markRecordSuccess(PayBatchRecord record) {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        record.setStatus(SUCCESS_STATUS);
+        record.setUpdatedAt(currentDateTime);
+        record.setRemark("Successfully Processed");
+        paymentRecordRepository.save(record);
+
+        log.info("│    → [FinancialAllocation] Record marked as SUCCESS");
     }
 }
