@@ -32,8 +32,8 @@ public class FileProcessorService {
 
     @Scheduled(fixedDelayString = "${paybatch.schedule.interval:5m}")
     public void scheduledFileProcessing() {
-        log.info("═══════════════════════════════════════════════════════════════════════════════");
-        log.info("[JOB_START] Scanning input directory: '{}' | Started at {}", inputDir, LocalDateTime.now());
+        log.info("───────────────────────────────────────────────────────────────────────────────");
+        log.info("[JOB_START] Scanning input directory: '{}'.", inputDir);
 
         try {
             processFiles();
@@ -41,8 +41,8 @@ public class FileProcessorService {
             log.error("[JOB_ERROR] Unexpected exception during file processing | error={}", e.getMessage(), e);
         }
 
-        log.info("[JOB_END] Finished at {}", LocalDateTime.now());
-        log.info("═══════════════════════════════════════════════════════════════════════════════");
+        log.info("[JOB_END  ] Job Finished.");
+        log.info("───────────────────────────────────────────────────────────────────────────────");
     }
 
     public void processFiles() {
@@ -50,15 +50,15 @@ public class FileProcessorService {
         File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".in"));
 
         if (files == null || files.length == 0) {
-            log.info("[NO_FILES] No '.in' files found in directory '{}'", inputDir);
+            log.info("[NO_FILES ] No input files found in directory '{}'", inputDir);
             return;
         }
 
-        log.info("[FILES_FOUND] {} file(s) found in '{}'", files.length, inputDir);
+        log.info("[FILES_FOUND   ] {} file(s) found in '{}'", files.length, inputDir);
 
         for (File file : files) {
             log.info("───────────────────────────────────────────────────────────────────────────────");
-            log.info("[FILE_START] Processing file '{}'", file.getName());
+            log.info("[FILE_START    ] Processing file '{}'", file.getName());
 
             File tmpFile = null;
             try {
@@ -70,15 +70,15 @@ public class FileProcessorService {
                 FileProcessingResult result = processSingleFile(tmpFile);
 
                 if (result.isProcessedSuccessfully()) {
-                    log.info("[FILE_SUCCESS] File '{}' processed successfully | totalRecords={} | success={} | errors={}",
+                    log.info("[FILE_SUCCESS  ] File '{}' processed successfully | totalRecords={} | success={} | errors={}",
                             result.getFileName(), result.getTotalRecords(), result.getSuccessCount(), result.getErrorCount());
                 } else {
-                    log.warn("[FILE_FAILED] File '{}' encountered processing issues | errors={}",
+                    log.warn("[FILE_FAILED   ] File '{}' encountered processing issues | errors={}",
                             result.getFileName(), result.getErrorCount());
                 }
 
             } catch (Exception e) {
-                log.error("[FILE_ERROR] Unexpected error while processing '{}' | {}", file.getName(), e.getMessage(), e);
+                log.error("[FILE_ERROR    ] Unexpected error while processing '{}' | {}", file.getName(), e.getMessage(), e);
                 fileHandlerService.handleInvalidFile(
                         tmpFile != null ? tmpFile : file,
                         null,
@@ -86,7 +86,7 @@ public class FileProcessorService {
                 );
             }
 
-            log.info("[FILE_END] Finished processing '{}'", file.getName());
+            log.info("[FILE_END      ] Finished processing '{}'", file.getName());
             log.info("───────────────────────────────────────────────────────────────────────────────");
         }
     }

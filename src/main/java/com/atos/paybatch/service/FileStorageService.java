@@ -41,7 +41,7 @@ public class FileStorageService {
         log.info("→ Step 1: Renaming file '{}' to temporary '.tmp' version", file.getName());
         File tmpFile = new File(file.getParent(), file.getName() + ".tmp");
         Files.move(file.toPath(), tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        log.debug("[FILE_RENAMED] {} → {}", file.getName(), tmpFile.getName());
+        log.debug("[FILE_RENAMED  ] {} → {}", file.getName(), tmpFile.getName());
         return tmpFile;
     }
 
@@ -77,7 +77,7 @@ public class FileStorageService {
             Path targetPath = Path.of(targetDir, cleanName);
             Files.createDirectories(targetPath.getParent());
             Files.move(file.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-            log.info("[FILE_MOVED] {} → {}", cleanName, targetDir);
+            log.info("[FILE_MOVED    ] {} → {}", cleanName, targetDir);
         } catch (Exception e) {
             log.error("[FILE_MOVE_ERROR] file={} | targetDir={} | reason={}", cleanName, targetDir, e.getMessage(), e);
         }

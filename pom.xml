@@ -131,6 +131,7 @@
 
     <!-- ======================= Build & Plugins ======================= -->
     <build>
+    <finalName>PayBatchTool</finalName>
         <plugins>
 
             <!-- Maven Compiler Plugin -->
