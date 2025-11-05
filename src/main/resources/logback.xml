@@ -18,8 +18,7 @@
         <file>${LOG_DIR}/${LOG_FILE}</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_DIR}/%d{yyyy-MM-dd}/${LOG_FILE}.gz</fileNamePattern>
-            <maxHistory>10</maxHistory>
-            <totalSizeCap>1GB</totalSizeCap>
+            <totalSizeCap>5GB</totalSizeCap>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>
