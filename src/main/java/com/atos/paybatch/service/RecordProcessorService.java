@@ -34,8 +34,8 @@ public class RecordProcessorService {
     @Transactional
     public Boolean processRecord(PayBatchRecord record, String glAccount) {
         String recordInfo = String.format(
-                "file='%s', line=%d, recordId=%d, customerCode=%s, amount=%s",
-                record.getPayBatchFile().getFilename(),
+                "fileId='%d', line=%d, recordId=%d, customerCode=%s, amount=%s",
+                record.getPayBatchFile().getId(),
                 record.getLineNo(),
                 record.getId(),
                 record.getCustomerCode(),

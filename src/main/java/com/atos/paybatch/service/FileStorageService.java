@@ -49,7 +49,7 @@ public class FileStorageService {
      * Computes a SHA-256 checksum for a file and returns it as a Base64-encoded string.
      */
     public String calculateChecksum(File file) throws Exception {
-        log.info("→ Step 2: Calculating checksum for '{}'", file.getName());
+        log.info("→ Step 2: Calculating checksum for '{}'", file.getName().replaceFirst("\\.tmp$", ""));
 
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
@@ -63,7 +63,7 @@ public class FileStorageService {
 
         byte[] hashBytes = digest.digest();
         String checksum = Base64.getEncoder().encodeToString(hashBytes);
-        log.debug("[CHECKSUM_GENERATED] file={} | checksum={}", file.getName(), checksum);
+        log.debug("[CHECKSUM_GENERATED] file={} | checksum={}", file.getName().replaceFirst("\\.tmp$", ""), checksum);
         return checksum;
     }
 
@@ -72,7 +72,7 @@ public class FileStorageService {
      * Automatically removes the ".tmp" extension during the move.
      */
     public void moveFileSafely(File file, String targetDir) {
-        String cleanName = file.getName().replace(".tmp", "");
+        String cleanName = file.getName().replaceFirst("\\.tmp$", "");
         try {
             Path targetPath = Path.of(targetDir, cleanName);
             Files.createDirectories(targetPath.getParent());
@@ -87,7 +87,7 @@ public class FileStorageService {
      * Moves the file to the 'processed' directory.
      */
     public void moveFileToProcessed(File file) {
-        log.info("→ Step: Moving file '{}' to PROCESSED directory", file.getName());
+        log.info("→ Step: Moving file '{}' to PROCESSED directory", file.getName().replaceFirst("\\.tmp$", ""));
         moveFileSafely(file, processedDir);
     }
 
@@ -95,7 +95,7 @@ public class FileStorageService {
      * Moves the file to the 'error' directory.
      */
     public void moveFileToError(File file) {
-        log.warn("→ Step: Moving file '{}' to ERROR directory", file.getName());
+        log.warn("→ Step: Moving file '{}' to ERROR directory", file.getName().replaceFirst("\\.tmp$", ""));
         moveFileSafely(file, errorDir);
     }
 
@@ -103,7 +103,7 @@ public class FileStorageService {
      * Moves the file to the 'duplicate' directory.
      */
     public void moveFileToDuplicate(File file) {
-        log.info("→ Step: Moving file '{}' to DUPLICATE directory", file.getName());
+        log.info("→ Step: Moving file '{}' to DUPLICATE directory", file.getName().replaceFirst("\\.tmp$", ""));
         moveFileSafely(file, duplicateDir);
     }
 }

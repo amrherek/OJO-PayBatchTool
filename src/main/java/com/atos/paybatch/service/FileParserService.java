@@ -41,7 +41,7 @@ public class FileParserService {
             int lineNo = 0;
             List<PaymentRecordDTO> records = new ArrayList<>();
 
-            log.debug("Parsing file: {}", file.getName());
+            log.debug("Parsing file: {}", file.getName().replaceFirst("\\.tmp$", ""));
 
             while ((line = br.readLine()) != null) {
                 lineNo++;
@@ -88,7 +88,7 @@ public class FileParserService {
                 validateTotals(parsedFile);
             }
 
-            log.debug("File parsed successfully: {}", file.getName());
+            log.debug("File parsed successfully: {}", file.getName().replaceFirst("\\.tmp$", ""));
         }
 
         return parsedFile;
