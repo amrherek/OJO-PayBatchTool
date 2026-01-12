@@ -23,8 +23,8 @@ public class PayBatchRecord {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "payment_seq")
-    @SequenceGenerator(name = "payment_seq", sequenceName = "SEQ_PAYMENT_ID", allocationSize = 1)
-    @Column(name = "PAYMENT_ID")
+    @SequenceGenerator(name = "payment_seq", sequenceName = "SEQ_RECORD_ID", allocationSize = 1)
+    @Column(name = "RECORD_ID")
     private Long id;
 
     @ManyToOne

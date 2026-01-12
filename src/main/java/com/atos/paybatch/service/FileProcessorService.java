@@ -32,7 +32,7 @@ public class FileProcessorService {
 
     @Scheduled(fixedDelayString = "${paybatch.schedule.interval:5m}")
     public void scheduledFileProcessing() {
-        log.info("───────────────────────────────────────────────────────────────────────────────");
+        log.info("────────────────────────────────────────────");
         log.info("[JOB_START] Scanning input directory: '{}'.", inputDir);
 
         try {
@@ -42,7 +42,7 @@ public class FileProcessorService {
         }
 
         log.info("[JOB_END  ] Job Finished.");
-        log.info("───────────────────────────────────────────────────────────────────────────────");
+        log.info("────────────────────────────────────────────");
     }
 
     public void processFiles() {
@@ -57,7 +57,7 @@ public class FileProcessorService {
         log.info("[FILES_FOUND   ] {} file(s) found in '{}'", files.length, inputDir);
 
         for (File file : files) {
-            log.info("───────────────────────────────────────────────────────────────────────────────");
+            log.info("────────────────────────────────────────────");
             log.info("[FILE_START    ] Processing file '{}'", file.getName());
 
             File tmpFile = null;
@@ -87,30 +87,32 @@ public class FileProcessorService {
             }
 
             log.info("[FILE_END      ] Finished processing '{}'", file.getName());
-            log.info("───────────────────────────────────────────────────────────────────────────────");
+            log.info("────────────────────────────────────────────");
         }
     }
 
     public FileProcessingResult processSingleFile(File tmpFile) throws Exception {
-        log.info("→ Step 2: Initializing file record for '{}'", tmpFile.getName());
-        FileProcessingResult result = new FileProcessingResult(tmpFile.getName());
-        PayBatchFile batchFile = fileHandlerService.initFile(tmpFile.getName());
+    	String inFileName=tmpFile.getName().replaceFirst("\\.tmp$", "");
+        
+    	log.info("→ Step 2: Initializing file record for '{}'", inFileName);
+        FileProcessingResult result = new FileProcessingResult(inFileName);
+        PayBatchFile batchFile = fileHandlerService.initFile(inFileName);
 
         // Step 3: Check for duplicates
         log.info("→ Step 3: Checking for duplicate file...");
         String checksum = fileStorageService.calculateChecksum(tmpFile);
         if (fileHandlerService.isDuplicate(checksum)) {
-            log.warn("[DUPLICATE_FILE] File '{}' already processed | checksum={}", tmpFile.getName(), checksum);
+            log.warn("[DUPLICATE_FILE] File '{}' already processed | checksum={}", inFileName, checksum);
             fileHandlerService.handleDuplicateFile(tmpFile, batchFile, checksum);
             return result;
         }
         batchFile.setFileChecksum(checksum);
 
         // Step 4: Parse and validate content
-        log.info("→ Step 4: Parsing and validating file '{}'", tmpFile.getName());
+        log.info("→ Step 4: Parsing and validating file '{}'", inFileName);
         ParsedFileDTO parsed = fileParserService.parseAndValidateFile(tmpFile);
         if (!parsed.isValid()) {
-            log.error("[VALIDATION_FAILED] File '{}' validation errors: {}", tmpFile.getName(), parsed.getErrors());
+            log.error("[VALIDATION_FAILED] File '{}' validation errors: {}", inFileName, parsed.getErrors());
             fileHandlerService.handleInvalidFile(tmpFile, batchFile, parsed.getErrors());
             return result;
         }
@@ -143,11 +145,11 @@ public class FileProcessorService {
         processPaymentRecords(paymentRecords, batchFile, result);
 
         // Step 8: Finalize file and move to processed directory
-        log.info("→ Step 8: Finalizing file '{}' post-processing", tmpFile.getName());
+        log.info("→ Step 8: Finalizing file '{}' post-processing", inFileName);
         fileHandlerService.handleFilePostProcessing(tmpFile, batchFile, result);
 
         log.info("[FILE_COMPLETED] File '{}' fully processed | totalRecords={} | success={} | errors={}",
-                tmpFile.getName(), result.getTotalRecords(), result.getSuccessCount(), result.getErrorCount());
+                inFileName, result.getTotalRecords(), result.getSuccessCount(), result.getErrorCount());
         return result;
     }
 

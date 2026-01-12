@@ -169,11 +169,11 @@ public class FileHandlerService {
 			payBatchFile.setRemark(String.join("; ", errors));
 			payBatchFileRepository.save(payBatchFile);
 		} else {
-			log.warn("No PayBatchFile record for file {} → skipping DB update", file.getName());
+			log.warn("No PayBatchFile record for file {} → skipping DB update", file.getName().replaceFirst("\\.tmp$", ""));
 		}
 
 		fileStorageService.moveFileToError(file);
-		log.debug("File {} rejected → {}", file.getName(), String.join("; ", errors));
+		log.debug("File {} rejected → {}", file.getName().replaceFirst("\\.tmp$", ""), String.join("; ", errors));
 	}
 
 	/**
@@ -190,7 +190,7 @@ public class FileHandlerService {
 		payBatchFileRepository.save(duplicateFile);
 
 		fileStorageService.moveFileToDuplicate(file);
-		log.debug("Duplicate file {} detected → moved to duplicate folder", file.getName());
+		log.debug("Duplicate file {} detected → moved to duplicate folder", file.getName().replaceFirst("\\.tmp$", ""));
 	}
 
 	// -------------------------------------------------------
