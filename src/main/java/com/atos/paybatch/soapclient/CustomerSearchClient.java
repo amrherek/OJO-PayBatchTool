@@ -52,7 +52,7 @@ public class CustomerSearchClient {
             log.info("│    → [CustomerSearch] API response: customerId={}", customerId);
 
             if (customerId == null) {
-                log.warn("│    → [CustomerSearch] No Customer ID returned for recordId={}", record.getId());
+                log.error("│    → [CustomerSearch] No Customer ID returned for recordId={}", record.getId());
                 markRecordFailed(record, "CustomerSearch returned no Customer ID");
             }
 
@@ -109,6 +109,6 @@ public class CustomerSearchClient {
         record.setRemark(remark);
         paymentRecordRepository.save(record);
 
-        log.warn("│    → [CustomerSearch] Record {} marked as FAILED — reason: {}", record.getId(), remark);
+        log.error("│    → [CustomerSearch] Record {} marked as FAILED — reason: {}", record.getId(), remark);
     }
 }

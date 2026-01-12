@@ -141,7 +141,10 @@ public class FileParserService {
         record.setPaymentType(Integer.parseInt(line.substring(1, 2)));
         record.setBankAccount(line.substring(2, 27).trim());
         record.setCustomerCode(line.substring(27, 47).trim().replaceFirst("^0+", ""));
-        record.setInvoiceNo(line.substring(47, 77).trim());
+        //record.setInvoiceNo(line.substring(47, 77).trim());
+        //The length of ohrefnum is 16 characters as per BSCS refnum configuration, so the first 14 characters from the reserved length should be ignored.
+        record.setInvoiceNo(line.substring(61, 77).trim());
+
 
         // Parse payment amount
         String amountStr = line.substring(77, 89);

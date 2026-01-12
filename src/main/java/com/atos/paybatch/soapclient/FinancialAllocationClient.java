@@ -117,7 +117,7 @@ public class FinancialAllocationClient {
         record.setRemark(remark);
         paymentRecordRepository.save(record);
 
-        log.warn("│    → [FinancialAllocation] Record {} marked as FAILED — reason: {}", record.getId(), remark);
+        log.error("│    → [FinancialAllocation] Record {} marked as FAILED — reason: {}", record.getId(), remark);
     }
 
     private void markRecordSuccess(PayBatchRecord record) {

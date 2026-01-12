@@ -95,7 +95,7 @@ public class FileStorageService {
      * Moves the file to the 'error' directory.
      */
     public void moveFileToError(File file) {
-        log.warn("→ Step: Moving file '{}' to ERROR directory", file.getName());
+        log.info("→ Step: Moving file '{}' to ERROR directory", file.getName());
         moveFileSafely(file, errorDir);
     }
 

@@ -73,7 +73,7 @@ public class FileProcessorService {
                     log.info("[FILE_SUCCESS  ] File '{}' processed successfully | totalRecords={} | success={} | errors={}",
                             result.getFileName(), result.getTotalRecords(), result.getSuccessCount(), result.getErrorCount());
                 } else {
-                    log.warn("[FILE_FAILED   ] File '{}' encountered processing issues | errors={}",
+                    log.error("[FILE_FAILED   ] File '{}' encountered processing issues | errors={}",
                             result.getFileName(), result.getErrorCount());
                 }
 

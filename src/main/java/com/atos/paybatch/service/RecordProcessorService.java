@@ -51,7 +51,7 @@ public class RecordProcessorService {
             Long customerId = customerSearchClient.searchCustomer(record);
 
             if (customerId == null) {
-                log.warn("│ [SKIPPED] Customer not found → recordId={}", record.getId());
+                log.error("│ [SKIPPED] Customer not found → recordId={}", record.getId());
                 log.info("└──────────── END RECORD ─────────────");
                 return false;
             }
@@ -62,7 +62,7 @@ public class RecordProcessorService {
             Long transactionId = financialAllocationClient.writeFinancialAllocation(record, customerId, glAccount);
 
             if (transactionId == null) {
-                log.warn("│ [SKIPPED] Financial allocation failed → recordId={}, customerId={}",
+                log.error("│ [SKIPPED] Financial allocation failed → recordId={}, customerId={}",
                         record.getId(), customerId);
                 log.info("└──────────── END RECORD ─────────────");
                 return false;
