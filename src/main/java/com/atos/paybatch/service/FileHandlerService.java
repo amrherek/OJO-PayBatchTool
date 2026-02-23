@@ -159,17 +159,26 @@ public class FileHandlerService {
 	/**
 	 * Marks the file as invalid, saves errors if PayBatchFile exists, moves file to
 	 * error folder.
+	 * 
+	 * @param result
 	 */
 	@Transactional
-	public void handleInvalidFile(File file, PayBatchFile payBatchFile, List<String> errors) {
+	public void handleInvalidFile(File file, PayBatchFile payBatchFile, List<String> errors,
+			FileProcessingResult result) {
 		if (payBatchFile != null) {
 			LocalDateTime currentDateTime = LocalDateTime.now();
 			payBatchFile.setStatus(STATUS_FAILED);
 			payBatchFile.setUpdatedAt(currentDateTime);
 			payBatchFile.setRemark(String.join("; ", errors));
+			if (result != null) {
+				payBatchFile.setRecordCount(result.getTotalRecords());
+				payBatchFile.setSuccessCount(result.getSuccessCount());
+				payBatchFile.setErrorCount(result.getErrorCount());
+			}
 			payBatchFileRepository.save(payBatchFile);
 		} else {
-			log.warn("No PayBatchFile record for file {} → skipping DB update", file.getName().replaceFirst("\\.tmp$", ""));
+			log.warn("No PayBatchFile record for file {} → skipping DB update",
+					file.getName().replaceFirst("\\.tmp$", ""));
 		}
 
 		fileStorageService.moveFileToError(file);
@@ -203,7 +212,7 @@ public class FileHandlerService {
 		// Determine final status
 		if (result.getSuccessCount() == 0) {
 			List<String> errors = List.of("All payment records failed during processing.");
-			handleInvalidFile(file, payBatchFile, errors);
+			handleInvalidFile(file, payBatchFile, errors, result);
 		} else {
 			LocalDateTime currentDateTime = LocalDateTime.now();
 			payBatchFile.setRecordCount(result.getTotalRecords());
