@@ -263,6 +263,32 @@
                                     </wsdlOptions>
                                 </configuration>
                             </execution>
+                            
+                            <!-- Customer Read Service -->
+                            <execution>
+                                <id>generate-customerread-stubs</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>wsdl2java</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceRoot>${project.build.directory}/generated-sources/cxf/customeread</sourceRoot>
+                                    <wsdlOptions>
+                                        <wsdlOption>
+                                            <wsdl>${project.basedir}/src/main/resources/wsdl/ws_CIL_7_CustomerReadService.wsdl</wsdl>
+                                            <extraargs>
+                                                <extraarg>-xjc-XautoNameResolution</extraarg>
+                                                <extraarg>-p</extraarg>
+                                                <extraarg>com.atos.paybatch.stubs.customerread</extraarg>
+                                                <extraarg>-frontend</extraarg>
+                                                <extraarg>jaxws21</extraarg>
+                                                <extraarg>-validate</extraarg>
+                                                <extraarg>-verbose</extraarg>
+                                            </extraargs>
+                                        </wsdlOption>
+                                    </wsdlOptions>
+                                </configuration>
+                            </execution>
 
                         </executions>
                     </plugin>
@@ -283,6 +309,11 @@
                                                 failonerror="false"/>
                                         <delete dir="${project.basedir}/src/main/java/com/atos/paybatch/stubs/customersearch"
                                                 failonerror="false"/>
+                                                
+										<delete dir="${project.basedir}/src/main/java/com/atos/paybatch/stubs/customerread"
+										        failonerror="false"/>
+
+                                                
 
                                         <!-- Copy new stubs -->
                                         <copy todir="${project.basedir}/src/main/java/com/atos/paybatch/stubs/financialallocation">
@@ -292,6 +323,11 @@
                                         <copy todir="${project.basedir}/src/main/java/com/atos/paybatch/stubs/customersearch">
                                             <fileset dir="${project.build.directory}/generated-sources/cxf/customersearch/com/atos/paybatch/stubs/customersearch"/>
                                         </copy>
+
+										<copy todir="${project.basedir}/src/main/java/com/atos/paybatch/stubs/customerread">
+										    <fileset dir="${project.build.directory}/generated-sources/cxf/customeread/com/atos/paybatch/stubs/customerread"/>
+										</copy>
+                                                
                                     </target>
                                 </configuration>
                                 <goals>

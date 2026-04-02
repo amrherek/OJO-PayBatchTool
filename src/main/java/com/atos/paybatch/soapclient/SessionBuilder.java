@@ -30,4 +30,19 @@ public class SessionBuilder {
         session.setValues(values);
         return session;
     }
+    
+    
+    public com.atos.paybatch.stubs.customerread.SessionChangeRequest buildCustomerReadSession() {
+        log.debug("Building session change request for CustomerRead...");   
+        var session = new com.atos.paybatch.stubs.customerread.SessionChangeRequest();
+        var values = new com.atos.paybatch.stubs.customerread.ValuesRequest();
+        var item = new com.atos.paybatch.stubs.customerread.ValuesListpartRequest();
+        item.setKey("BU_ID");
+        item.setValue("2");
+        values.getItem().add(item);
+        session.setValues(values);
+        return session;
+    }
+    
+    
 }
