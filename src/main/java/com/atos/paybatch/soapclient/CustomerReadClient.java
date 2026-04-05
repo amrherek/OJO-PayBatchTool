@@ -2,8 +2,11 @@
 package com.atos.paybatch.soapclient;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -33,10 +36,15 @@ public class CustomerReadClient {
 	private final CustomerReadService customerReadService;
 	private final SessionBuilder sessionBuilder;
 	private final PayBatchRecordRepository paymentRecordRepository;
+	@Value("${customer.prepaid-price-groups}")
+	private String prepaidPriceGroupsConfig;
+
+	@Value("${customer.allow-non-payment-resp}")
+	private boolean allowNonPaymentResponsible;
 
 	@Retryable(value = {
 			TransientException.class }, maxAttemptsExpression = "${customerread.api.max-retries:3}", backoff = @Backoff(delayExpression = "${customerread.api.retry-delay-ms:2000}"))
-	public CustomerDetails readCustomer(Long customerId, PayBatchRecord record) {
+	public boolean readCustomer(Long customerId, PayBatchRecord record) {
 
 		int attempt = RetrySynchronizationManager.getContext() != null
 				? RetrySynchronizationManager.getContext().getRetryCount() + 1
@@ -50,16 +58,20 @@ public class CustomerReadClient {
 
 			CustomerDetails details = extractCustomerDetails(response).orElse(null);
 
-			log.info("│    → [CustomerRead] API response: priceGroup={}, paymentResponsible={}",
-					details != null ? details.getPriceGroup() : null,
-					details != null ? details.getPaymentResponsible() : null);
-
 			if (details == null) {
 				log.error("│    → [CustomerRead] No data returned for customerId={}", customerId);
 				markRecordFailed(record, "CustomerRead returned no data");
+				return false;
 			}
 
-			return details;
+			String priceGroup = details.getPriceGroup();
+			Boolean paymentResponsible = details.getPaymentResponsible();
+
+			log.info("│    → [CustomerRead] API response: priceGroup={}, paymentResponsible={}", priceGroup,
+					paymentResponsible);
+
+			// APPLY SAME LOGIC HERE
+			return isPaymentAllowed(priceGroup, paymentResponsible, record);
 
 		} catch (Exception ex) {
 			log.error("│    → [CustomerRead] API error (attempt={}): {}", attempt, ex.getMessage(), ex);
@@ -72,25 +84,26 @@ public class CustomerReadClient {
 			} else {
 				log.error("│    → [CustomerRead] Record failed → recordId={} | reason={}", record.getId(), rootMessage);
 				markRecordFailed(record, "CustomerRead failed: " + rootMessage);
-				return null;
+				return false;
 			}
 		}
 	}
 
 	@Recover
-	public CustomerDetails recover(RuntimeException ex, Long customerId, PayBatchRecord record) {
+	public boolean recover(RuntimeException ex, Long customerId, PayBatchRecord record) {
 		String rootMessage = SoapExceptionUtils.getRootCauseMessage(ex);
 		log.error("│    → [CustomerRead] Record permanently failed after retries → recordId={} | reason={}",
 				record.getId(), rootMessage);
 		markRecordFailed(record, "CustomerRead failed after all retry attempts: " + rootMessage);
-		return null;
+		return false;
 	}
 
 	private CustomerReadRequest buildRequest(Long customerId) {
 		InputAttributes attributes = new InputAttributes();
-		attributes.setCsId(customerId);;
-		//attributes.setSyncWithDb(Boolean.FALSE);
-		
+		attributes.setCsId(customerId);
+		;
+		// attributes.setSyncWithDb(Boolean.FALSE);
+
 		CustomerReadRequest request = new CustomerReadRequest();
 		request.setInputAttributes(attributes);
 		request.setSessionChangeRequest(sessionBuilder.buildCustomerReadSession());
@@ -124,4 +137,31 @@ public class CustomerReadClient {
 
 		log.error("│    → [CustomerRead] Record {} marked as FAILED — reason: {}", record.getId(), remark);
 	}
+
+	private List<String> prepaidPriceGroups() {
+		return Arrays.stream(prepaidPriceGroupsConfig.split(",")).map(String::trim).toList();
+	}
+
+	private boolean isPaymentAllowed(String priceGroup, Boolean paymentResponsible, PayBatchRecord record) {
+
+		if (priceGroup != null && prepaidPriceGroups().contains(priceGroup))
+		 {
+			String remark = "Customer belongs to prepaid price group: " + priceGroup;
+			markRecordFailed(record, remark);
+			log.error("│ [SKIPPED] Customer belongs to prepaid price group → recordId={}, priceGroup={}",
+					record.getId(), priceGroup);
+			return false;
+		}
+
+		if (Boolean.FALSE.equals(paymentResponsible) && !allowNonPaymentResponsible) {
+			String remark = "Customer is not payment responsible";
+			markRecordFailed(record, remark);
+			log.error("│ [SKIPPED] Customer is not payment responsible → recordId={}, paymentResponsible={}",
+					record.getId(), paymentResponsible);
+			return false;
+		}
+
+		return true;
+	}
+
 }

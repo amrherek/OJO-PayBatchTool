@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.atos.paybatch.stubs.customerread.CustomerReadService;
+import com.atos.paybatch.stubs.customerread.CustomerReadService_Service;
 import com.atos.paybatch.stubs.customersearch.CustomersSearchService;
 import com.atos.paybatch.stubs.customersearch.CustomersSearchService_Service;
 import com.atos.paybatch.stubs.financialallocation.FinancialAllocationWriteService;
@@ -104,6 +106,25 @@ public class SoapClientConfig {
 
         FinancialAllocationWriteService port = service.getFinancialAllocationWriteServiceSoap11();
         log.info("FinancialAllocationWriteService endpoint: {}", bscsWebServiceEndpoint);
+        return configurePort(port, bscsWebServiceEndpoint);
+    }
+    
+    
+    @Bean
+    public CustomerReadService customerReadPort() throws Exception {
+        URL wsdl = getClass().getResource("/wsdl/ws_CIL_7_CustomerReadService.wsdl");
+        if (wsdl == null) {
+            throw new IllegalStateException("WSDL not found: /wsdl/ws_CIL_7_CustomerReadService.wsdl");
+        }
+
+        QName serviceName = new QName("http://ericsson.com/services/ws_CIL_7", "CustomerReadService");
+        CustomerReadService_Service service = new CustomerReadService_Service(wsdl, serviceName);
+
+        service.setHandlerResolver(portInfo -> java.util.Collections.singletonList(
+                new WSSUsernameTokenSOAPHandler(username, password)));
+
+        CustomerReadService port = service.getCustomerReadServiceSoap11();
+        log.info("CustomerReadService endpoint: {}", bscsWebServiceEndpoint);
         return configurePort(port, bscsWebServiceEndpoint);
     }
 }
