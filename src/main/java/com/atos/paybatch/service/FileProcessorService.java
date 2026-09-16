@@ -263,6 +263,7 @@ public class FileProcessorService {
 				int newError = existingError - successCount;
 				file.setErrorCount(newError < 0 ? 0 : newError);
 
+				file.setStatus("P");
 				file.setUpdatedAt(LocalDateTime.now());
 
 				payBatchFileRepository.save(file);
