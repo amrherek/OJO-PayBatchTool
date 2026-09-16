@@ -151,7 +151,7 @@ public class FileParserService {
         try {
             long intPart = Long.parseLong(amountStr.substring(0, 9));
             int decimalPart = Integer.parseInt(amountStr.substring(9, 12));
-            record.setPaymentAmount(intPart + decimalPart / 1000.0);
+            record.setPaymentAmount((intPart * 1000 + decimalPart) / 1000.0);
         } catch (NumberFormatException e) {
             record.setValid(false);
             record.setError("Invalid payment amount at line " + lineNo);
@@ -187,7 +187,7 @@ public class FileParserService {
             String amountStr = line.substring(9, 24);
             long intPart = Long.parseLong(amountStr.substring(0, 12));
             int decimalPart = Integer.parseInt(amountStr.substring(12, 15));
-            trailer.setTotalAmount(intPart + decimalPart / 1000.0);
+            trailer.setTotalAmount((intPart * 1000 + decimalPart) / 1000.0);
         } catch (NumberFormatException e) {
             trailer.setValid(false);
             trailer.setError("Invalid trailer numbers");
